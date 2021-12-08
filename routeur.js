@@ -4,6 +4,7 @@ const routeur = express.Router();
 const twig = require("twig");
 const livreSchema = require("./models/livres.modele");
 const multer = require("multer");
+const fs = require("fs");
 
 const storage = multer.diskStorage({
     destination : (requete, file, cb)=> {
@@ -114,19 +115,32 @@ routeur.post("/livres/modificationServer", (requete, reponse) => {
         })
 })
 
+
+//suppression d'un livre
 routeur.post("/livres/delete/:id", (requete, reponse) => {
-    livreSchema.remove({_id: requete.params.id})
+    var livre = livreSchema.findById(requete.params.id)
+        .select("image")
         .exec()
-        .then(resultat => {
-            requete.session.message = {
-                type : 'success',
-                contenu : 'Suppression effectuée'
-            }
-            reponse.redirect("/livres");
-        })
-        .catch(error => {
-            console.log(error);
-        })
+        .then(livre => {
+            fs.unlink("./public/images/"+ livre.image, error => {
+                console.log(error);
+            })
+            livreSchema.remove({_id: requete.params.id})
+                .exec()
+                .then(resultat => {
+                    requete.session.message = {
+                        type : 'success',
+                        contenu : 'Suppression effectuée'
+                    }
+                    reponse.redirect("/livres");
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+    })
+    .catch(error => {
+        console.log(error);
+    })
 })
 
 
