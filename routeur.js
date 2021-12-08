@@ -3,6 +3,33 @@ const mongoose = require("mongoose");
 const routeur = express.Router();
 const twig = require("twig");
 const livreSchema = require("./models/livres.modele");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+    destination : (requete, file, cb)=> {
+        cb(null, "./public/images/")
+    },
+    filename : (requete, file, cb)=> {
+        var date = new Date().toLocaleDateString().replace(/\//g, '-');
+        // console.log(date);
+        cb(null, date+"-"+Math.round(Math.random() * 10000)+"-"+file.originalname)
+    }
+});
+const fileFilter = (requete, file, cb) =>{
+    if(file.mimetype === "image/jpeg" || file.mimetype === "image/png"){
+        cb(null, true)
+    } else {
+        cb(new Error("l'image n'est pas acceptée"),false)
+    }
+}
+
+const upload = multer({
+    storage : storage,
+    limits : {
+        fileSize : 1024 * 1024 * 5
+    },
+    fileFilter : fileFilter
+})
 
 routeur.get("/", (requete, reponse) => {
     reponse.render("accueil.html.twig");
@@ -16,13 +43,14 @@ routeur.get("/livres", (requete, reponse) => {
         .catch();
 })
 
-routeur.post("/livres", (requete, reponse) => {
+routeur.post("/livres", upload.single("image"), (requete, reponse) => {
     const livre = new livreSchema({
         _id: new mongoose.Types.ObjectId(),
         nom: requete.body.titre,
         auteur: requete.body.auteur,
         pages: requete.body.pages,
-        description: requete.body.description
+        description: requete.body.description,
+        image : requete.file.path.substring(14)
     });
     livre.save()
         .then(resultat => {
@@ -57,6 +85,32 @@ routeur.get("/livres/modification/:id", (requete, reponse) => {
         })
         .catch(error => {
             console.log(error);
+        })
+})
+
+routeur.post("/livres/modificationServer", (requete, reponse) => {
+    const livreUpdate = {
+        nom : requete.body.titre,
+        auteur : requete.body.auteur,
+        pages : requete.body.pages,
+        description : requete.body.description
+    }
+    livreSchema.updateOne({_id:requete.body.identifiant}, livreUpdate)
+        .exec()
+        .then(resultat =>{
+            if(resultat.modifiedCount < 1) throw new Error("Requete de modification échouée");
+            requete.session.message = {
+                type : 'success',
+                contenu : 'Modification effectuée'
+            }
+            reponse.redirect("/livres");
+        })
+        .catch(error => {
+            requete.session.message = {
+                type : 'danger',
+                contenu : error.message
+            }
+            reponse.redirect("/livres");
         })
 })
 

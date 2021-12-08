@@ -4,14 +4,12 @@ const morgan = require("morgan");
 const router = require("./routeur");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
-const session = require("express-session")
+const session = require("express-session");
 
 mongoose.connect("mongodb://localhost/biblio", {
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
-
-
 
 server.use(express.static("public"));
 server.use(morgan("dev"));
