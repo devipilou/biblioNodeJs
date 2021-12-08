@@ -34,12 +34,26 @@ routeur.post("/livres", (requete, reponse) => {
         })
 })
 
+// Affichage détaillé d'un livre
 routeur.get("/livres/:id", (requete, reponse) => {
     console.log(requete.params.id);
     livreSchema.findById(requete.params.id)
         .exec()
         .then(livre => {
-            reponse.render("livres/livre.html.twig", {livre : livre});
+            reponse.render("livres/livre.html.twig", {livre : livre, isModification: false});
+        })
+        .catch(error => {
+            console.log(error);
+        })
+})
+
+// Modification d'un livre (formulaire)
+routeur.get("/livres/modification/:id", (requete, reponse) => {
+    console.log(requete.params.id);
+    livreSchema.findById(requete.params.id)
+        .exec()
+        .then(livre => {
+            reponse.render("livres/livre.html.twig", {livre : livre, isModification: true});
         })
         .catch(error => {
             console.log(error);
