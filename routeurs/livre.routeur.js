@@ -31,13 +31,13 @@ const upload = multer({
     fileFilter : fileFilter
 })
 
-routeur.get("/livres", livreController.livres_affichage);
-routeur.post("/livres", upload.single("image"), livreController.livres_ajout);
-routeur.get("/livres/:id", livreController.livre_affichage);
-routeur.get("/livres/modification/:id", livreController.livre_modification);
-routeur.post("/livres/modificationServer", livreController.livre_modification_validation);
-routeur.post("/livres/updateImage", upload.single("image"), livreController.livre_modification_image);
-routeur.post("/livres/delete/:id", livreController.livre_suppression);
+routeur.get("/", livreController.livres_affichage);
+routeur.post("/", upload.single("image"), livreController.livres_ajout);
+routeur.get("/:id", livreController.livre_affichage);
+routeur.get("/modification/:id", livreController.livre_modification);
+routeur.post("/modificationServer", livreController.livre_modification_validation);
+routeur.post("/updateImage", upload.single("image"), livreController.livre_modification_image);
+routeur.post("/delete/:id", livreController.livre_suppression);
 
 
 module.exports = routeur;

@@ -1,0 +1,59 @@
+{% extends "base.html.twig" %}
+{% block titre %}
+Page affichant les auteurs
+{% endblock %}
+{% block contenu %}
+<table class="table text-center monTableau" id="tableauAuteurs">
+	<thead>
+		<tr class="table-dark">
+			<th>Prénom - Nom</th>
+			<th>Nombre de livres</th>
+			<th colspan="2">Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for auteur in auteurs %}
+		<tr>
+			<td class="align-middle"><a href="/auteurs/{{auteur._id}}">{{auteur.prenom}} {{auteur.nom}}</a></td>
+			<td class="align-middle">{{auteur.livres|length}}</td>
+			<td class="align-middle">
+				<a href="/auteurs/modification/{{auteur._id}}" class="btn btn-warning">Modifier</a>
+			</td>
+			<td class="align-middle">
+				<form method="post" action="/auteurs/delete/{{auteur._id}}" onsubmit="return confirm('Voulez-vous vraiment supprimer l\'auteur ?')">
+					<button class="btn btn-danger" type="submit">Supprimer</button>
+				</form>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<button class="btn btn-success w-100" onclick="afficherFormulaire()">Ajouter</button>
+
+
+{# Ajout d'un auteur #}
+<form id="ajoutForm" class="d-none" method="post" action="">
+	<fieldset>
+		<legend>Création d'un auteur</legend>
+		<div class="form-group">
+			<label for="prenom">Prénom</label>
+			<input type="text" class="form-control" id="prenom" name="prenom">
+		</div>
+		<div class="form-group">
+			<label for="nom">Nom</label>
+			<input type="text" class="form-control" id="nom" name="nom">
+		</div>
+		<div class="form-group">
+			<label for="age">Age</label>
+			<input type="number" name="age" id="age" class="form-control">
+		</div>
+		<div class="form-group form-check-inline">
+			<input type="checkbox"  id="sexe" name="sexe" class="form-check-input" checked>
+			<label for="sexe" class="form-check-label">Homme</label>
+		</div>
+		<button class="btn btn-primary" type="submit">Valider</button>
+	</fieldset>
+</form>
+<script src="/javascript/ajout.js"></script>
+{% endblock %}
